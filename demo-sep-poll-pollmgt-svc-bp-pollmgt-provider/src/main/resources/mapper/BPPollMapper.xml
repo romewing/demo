@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upsoft.sep.bp.poll.dao.IPollSourceDao">
+
+	<!-- 参数公共Map -->
+<!-- 	<parameterMap id="Param_PollSource" type="com.upsoft.sep.bp.poll.entity.PollSource"></parameterMap> -->
+	
+	<!-- 返回值公共Map -->
+	<resultMap id="resultPollSource1" type="com.upsoft.sep.bp.poll.entity.PollSource">
+		<result column="Id" property="id"/>
+		<result column="Enterprise_Introduction"  property="enterpriseIntroduction" />
+		<result column="Addr_Detail"  property="addrDetail" />
+		<result column="Web_Site"  property="webSite" />
+		<result column="E_Mail"  property="email" />
+		<result column="Org_Code"  property="orgCode" />
+		<result column="Zip_Code"  property="zipCode" />
+		<result column="Production_Status"  property="productionStatus" />
+		<result column="CreateTime"  property="createTime" />
+	</resultMap>
+	
+	<!-- 表名 -->
+	<sql id="Table_Name">
+	    <![CDATA[
+			poll_source
+	    ]]>
+	</sql>
+	
+	<!-- =====公共配置===== -->
+	<!-- 用于select或insert查询公用抽取的列 -->
+	<sql id="Select_or_Insert_Columns">
+	    <![CDATA[
+ 			Id,Name,Enterprise_Introduction, Addr_Detail,Web_Site,E_Mail,Org_Code,Zip_Code,Production_Status,CreateTime 
+ 	    ]]> 
+	</sql> 
+	
+	<!-- 用于插入公用字段值的列 -->
+	<sql id="Insert_Column_Value">
+	    #{id},#{name},#{enterpriseIntroduction}, #{addrDetail},#{webSite},
+		#{email},#{orgCode},#{zipCode},#{productionStatus},#{createTime}
+	</sql>
+	
+	
+	<!-- =====具体操作==== -->
+	<insert id="inertPollSource" parameterType="com.upsoft.sep.bp.poll.entity.PollSource" >
+		INSERT INTO
+			<include refid="Table_Name" />
+		(
+			<include refid="Select_or_Insert_Columns" />
+		)
+		VALUES
+		(
+			<include refid="Insert_Column_Value" />
+		)
+		
+	</insert>
+	
+	<update id="updatePollSourceById" parameterType="com.upsoft.sep.bp.poll.entity.PollSource">
+		 UPDATE 
+		 	<include refid="Table_Name" /> 
+		 SET 
+			 Id=#{id}
+			<if test="name != null">
+				,Name=#{name}
+			</if>
+			<if test="enterpriseIntroduction != null">
+				,Enterprise_introduction=#{enterpriseIntroduction}
+			</if>
+			<if test="addrDetail != null">
+				,addr_detail=#{addrDetail}
+			</if>
+			<if test="webSite != null">
+				,Web_site=#{webSite}
+			</if>
+			<if test="orgCode != null">
+				,Org_Code=#{orgCode}
+			</if>
+			<if test="zipCode != null">
+				,Zip_Code=#{zipCode}
+			</if>
+			<if test="email != null">
+				,E_Mail=#{email}
+			</if>
+			<if test="productionStatus != null">
+				,Production_Status=#{productionStatus}
+			</if>
+			
+		 WHERE 
+			 id=#{id}
+	</update>
+	
+	<delete id="delPollSourceById">
+    	DELETE	FROM
+    		<include refid="Table_Name" />
+       WHERE
+       		id=#{id}
+	</delete>
+	
+	
+	
+	<select id="getPollSourceById" parameterType="String" resultMap="resultPollSource1">
+    	SELECT 
+    		<include refid="Select_or_Insert_Columns" />
+       FROM
+        	<include refid="Table_Name" />
+       WHERE
+       		id=#{id}
+	</select>
+	
+	
+	
+	<select id="queryPollSourcePage" parameterType="com.upsoft.sep.bp.common.entity.RequestPage"  resultMap="resultPollSource1">
+    	SELECT 
+    		<include refid="Select_or_Insert_Columns" />
+       FROM
+        	<include refid="Table_Name" />
+       WHERE
+       		1=1
+       		<if test="param.orgCode != null and param.orgCode!=''">
+				and Org_Code like '%${param.orgCode}%'
+			</if>
+       		order by CreateTime desc
+	</select>
+	
+</mapper>

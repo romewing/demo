@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script type="text/javascript">
+
+
+
+// $.ajax({
+// 	   async:false,
+// 	   url:"http://127.0.0.1:8082/bp/poll/updatePollSourceById/" ,
+// 	   type: "post",
+// 	   dataType: 'jsonp',
+// 	   jsonp: 'jsoncallback',
+// 	   data: qsData,
+// 	   timeout: 5000,
+// 	   beforeSend: function(){
+// 	   //jsonp 方式此方法不被触发.原因可能是dataType如果指定为jsonp的话,就已经不是ajax事件了
+// 	   },
+// 	   success: function (json) {//客户端jquery预先定义好的callback函数,成功获取跨域服务器上的json数据后,会动态执行这个callback函数
+// 	    	alert();
+// 	   },
+// 	    complete: function(XMLHttpRequest, textStatus){
+// 	    	alert("");
+// 	   },
+// 	   error: function(xhr){
+// 	    	alert("请求出错(请检查相关度网络状况.)");
+// 	   }
+// 	});
+
+// 	var url="http://127.0.0.1/bp/poll/query/1"
+// 	$.get(url,qsData,function(a,b){
+// 		console.log(a);
+// 	});
+
+	var qsData={id:1,name:'fsd',createTime:'1'};
+	var url="/cgi/poll/poll/updatePollSourceById/"
+// 	$.post(url,qsData,function(a,b){
+// 		comsole.log(b);
+// 	});
+	
+	jQuery.ajax({
+	    'type': 'POST',
+	    'url': url,
+	    'contentType': 'application/json',
+	    'data': JSON.stringify(qsData),
+	    'dataType': 'json',
+	    'success': callback
+	    });
+	
+	function callback(){
+		
+	}
+</script>
+</head>
+<body>
+
+</body>
+</html>

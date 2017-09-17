@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<beans xmlns="http://www.springframework.org/schema/beans"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+    xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"  
+    xsi:schemaLocation="http://www.springframework.org/schema/beans          
+    http://www.springframework.org/schema/beans/spring-beans.xsd          
+    http://code.alibabatech.com/schema/dubbo          
+    http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+   
+ 	<!-- 提供方应用信息，用于计算依赖关系 -->  
+    <dubbo:application name="poll-demoService"/>
+   
+    <!--  使用zookeeper注册中心暴露服务地址   --> 
+<!--     <dubbo:registry address="zookeeper://${zk.address}" register="${dubbo.register}" check="false" /> -->
+    <dubbo:registry address="zookeeper://127.0.0.1:2181" register="false" check="false"  />
+
+   <!--  用dubbo协议在20880端口暴露服务   -->
+    <!-- <dubbo:protocol name="dubbo" port="20880" />   -->
+   <dubbo:protocol name="rest" port="${dubbo.port}" server="tomcat" contextpath="${dubbo.contextPath}"/>
+	
+	
+	 <!-- 配置swaggerService-->
+    <bean id="swaggerService" class="com.upsoft.sep.bp.common.swagger.SwaggerServiceImpl" />
+    <!-- Swagger Configuration -->
+    <bean id="beanConfig" class="io.swagger.jaxrs.config.BeanConfig">
+        <property name="schemes" value="http" />
+         <!--扫描的包路径-->
+        <property name="resourcePackage" value="com.upsoft.sep.bp"/>
+        <property name="version" value="0.0.1"/>
+        <!--swagger-ui页面上模拟请求地址-->
+        <property name="host" value="127.0.0.1:80"/>
+        <property name="basePath" value="/cgi/bp"/>
+        <property name="title" value="基础平台api"/>
+        <property name="description" value="基础平台包括：单点登录、用户、权限、数据字典"/>
+        <property name="contact" value="扬讯软件"/>
+        <property name="license" value="Apache 2.0"/>
+        <property name="licenseUrl" value="http://www.apache.org/licenses/LICENSE-2.0.html"/>
+        <property name="scan" value="true"/>
+    </bean>
+     <!-- 配置swaggerService接口-->
+    <dubbo:service interface="com.upsoft.sep.bp.common.swagger.SwaggerService" ref="swaggerService"/>
+</beans>  

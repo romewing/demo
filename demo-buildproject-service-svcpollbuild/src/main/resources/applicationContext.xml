@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	   http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	   http://www.springframework.org/schema/tx  http://www.springframework.org/schema/tx/spring-tx-4.0.xsd  
+	   http://www.springframework.org/schema/aop  http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+	   http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+	<import resource="classpath*:dubboprovider*.xml" />
+	<import resource="classpath*:dubboconsumer*.xml" />
+
+
+	<beans profile="development">
+		<context:property-placeholder location="classpath:/**/*-holder.properties" />
+		<util:properties id="properties"
+			location="classpath:/**/*-holder.properties" />
+		<bean class="com.upsoft.sep.bp.common.support.logback.LogbackConfigLoader"
+			p:location="classpath:logback.xml" />
+
+		<bean id="abstractXADataSource" class="com.atomikos.jdbc.nonxa.AtomikosNonXADataSourceBean"
+			init-method="init" destroy-method="close" abstract="true">
+			<!-- <property name="xaDataSourceClassName" value="com.mysql.jdbc.Driver" 
+				/> -->
+			<property name="poolSize" value="${jdbc.default.poolSize}" />
+			<property name="minPoolSize" value="${jdbc.default.minPoolSize}" />
+			<property name="maxPoolSize" value="${jdbc.default.maxPoolSize}" />
+			<property name="borrowConnectionTimeout" value="${jdbc.default.borrowConnectionTimeout}" />
+			<property name="reapTimeout" value="${jdbc.default.reapTimeout}" />
+			<property name="maxIdleTime" value="${jdbc.default.maxIdleTime}" />
+			<property name="maintenanceInterval" value="${jdbc.default.maintenanceInterval}" />
+			<property name="loginTimeout" value="${jdbc.default.loginTimeout}" />
+			<property name="logWriter" value="${jdbc.default.logWriter}" />
+			<property name="maxLifetime" value="${jdbc.default.maxLifetime}" />
+			<!-- <property name="testQuery"> <value>select 1 from dual</value> </property> -->
+		</bean>
+
+		<!-- dict_db数据源配置 -->
+		<bean id="ds-bp-dict-db" parent="abstractXADataSource">
+			<property name="uniqueResourceName" value="mysql/ds-bp-dict-db" />
+			<property name="driverClassName">
+				<value>${jdbc.bp.dict.driverClassName}</value>
+			</property>
+			<property name="url">
+				<value>${jdbc.bp.dict.url}</value>
+			</property>
+			<property name="user">
+				<value>${jdbc.bp.dict.username}</value>
+			</property>
+			<property name="password">
+				<value>${jdbc.bp.dict.password}</value>
+			</property>
+		</bean>
+		<!-- dict_db数据源配置 -->
+		<bean id="ds-bp-poll-db" parent="abstractXADataSource">
+			<property name="uniqueResourceName" value="mysql/ds-bp-poll-db" />
+			<property name="driverClassName">
+				<value>${jdbc.bp.poll.driverClassName}</value>
+			</property>
+			<property name="url">
+				<value>${jdbc.bp.poll.url}</value>
+			</property>
+			<property name="user">
+				<value>${jdbc.bp.poll.username}</value>
+			</property>
+			<property name="password">
+				<value>${jdbc.bp.poll.password}</value>
+			</property>
+		</bean>
+		<bean id="ds-bp-iot-db" parent="abstractXADataSource">
+			<property name="uniqueResourceName" value="mysql/ds-bp-iot-db" />
+			<property name="driverClassName">
+				<value>${jdbc.bp.iot.driverClassName}</value>
+			</property>
+			<property name="url">
+				<value>${jdbc.bp.iot.url}</value>
+			</property>
+			<property name="user">
+				<value>${jdbc.bp.iot.username}</value>
+			</property>
+			<property name="password">
+				<value>${jdbc.bp.iot.password}</value>
+			</property>
+		</bean> 
+		<bean id="ds-bp-lims-db" parent="abstractXADataSource">
+	        <property name="uniqueResourceName" value="mysql/ds-bp-lims-db" />
+	        <property name="driverClassName">
+	        	<value>${jdbc.bp.lims.driverClassName}</value>
+	        </property>
+	        <property name="url">  
+	            <value>${jdbc.bp.lims.url}</value>  
+	        </property>  
+	        <property name="user">  
+	            <value>${jdbc.bp.lims.username}</value>  
+	        </property>  
+	        <property name="password">  
+	            <value>${jdbc.bp.lims.password}</value>  
+	        </property>   
+    	</bean> 
+		<!-- dict_db数据源配置 -->
+		<bean id="ds-bp-user-db" parent="abstractXADataSource">
+			<property name="uniqueResourceName" value="mysql/ds-bp-user-db" />
+			<property name="driverClassName">
+				<value>${jdbc.bp.user.driverClassName}</value>
+			</property>
+			<property name="url">
+				<value>${jdbc.bp.user.url}</value>
+			</property>
+			<property name="user">
+				<value>${jdbc.bp.user.username}</value>
+			</property>
+			<property name="password">
+				<value>${jdbc.bp.user.password}</value>
+			</property>
+		</bean>
+
+		<!-- auth 数据源配置 -->
+		<bean id="ds-bp-auth-db" parent="abstractXADataSource">
+			<property name="uniqueResourceName" value="mysql/ds-bp-auth-db" />
+			<property name="driverClassName">
+				<value>${jdbc.bp.auth.driverClassName}</value>
+			</property>
+			<property name="url">
+				<value>${jdbc.bp.auth.url}</value>
+			</property>
+			<property name="user">
+				<value>${jdbc.bp.auth.username}</value>
+			</property>
+			<property name="password">
+				<value>${jdbc.bp.auth.password}</value>
+			</property>
+		</bean>
+
+		<!-- dp-sso数据源配置 -->
+		<bean id="ds-bp-sso" parent="abstractXADataSource">
+			<property name="uniqueResourceName" value="mysql/ds-bp-sso" />
+			<property name="driverClassName">
+				<value>${jdbc.bp.sso.driverClassName}</value>
+			</property>
+			<property name="url">
+				<value>${jdbc.bp.sso.url}</value>
+			</property>
+			<property name="user">
+				<value>${jdbc.bp.sso.username}</value>
+			</property>
+			<property name="password">
+				<value>${jdbc.bp.sso.password}</value>
+			</property>
+		</bean>
+		<context:annotation-config />
+		<context:component-scan base-package="com.upsoft.sep" />
+	</beans>
+
+</beans>

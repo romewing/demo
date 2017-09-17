@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link href="../../common/libs/qui/3.3/css/import_basic.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" id="skin" prePath="../../common/" splitMode="true" href="../../common/libs/qui/3.3/skins/blue/style.css"/>
+<script type="text/javascript" src="../../common/js/common/DateFormatUtil.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/jquery.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/language/cn.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/main.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/framework.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/form/datePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/form/upload/fileUpload.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/form/upload/handlers.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/table/quiGrid.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/popup/drag.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/popup/dialog.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/nav/pageArrow.js"></script> 
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/nav/pageNumber.js"></script>
+<script type="text/javascript" src="../../common/js/common/pagation.js"></script> 
+
+
+<title>任务列表</title>
+<script type="text/javascript">
+$.support.cors = true;
+var BasePath="../../../cgi/"; 
+$.support.cors = true;
+$(function(){ 
+	initGrid();
+	loadData();
+	bindEnterEvent();
+});
+
+function bindEnterEvent(){
+	document.onkeydown = function(e){
+	    var ev = document.all ? window.event : e;
+	    if(ev.keyCode==13) {
+	    	searchHandler();
+	    }
+	}
+}
+
+
+var grid = null;
+function initGrid(data) {
+	if (!data) {
+		data = {rows:[]};
+	}
+	grid = jQuery("#maingrid").quiGrid({
+		columns : [
+			{display : '污染源ID', name : 'id', align : 'left', width : "10%"},
+			{display : '污染源名称', name : 'name', align : 'left', width : "10%", render : function(rowdata, rowindex, value, column) {
+					return value;
+			}},
+			{display : '官网', name : 'webSite', align : 'left', width : "10%"},
+			{display : 'eMail', name : 'email', align : 'left', width : "10%"},
+			{display : '组织代码', name : 'orgCode', align : 'left', width : "5%" },
+			{display : '邮编', name : 'zipCode', align : 'left', width : "5%" },
+			{display : '地址详情', name : 'addrDetail', align : 'left', width : "2%" },
+			{display : '企业介绍', name : 'enterpriseIntroduction', align : 'left', width : "4%" },
+			{display : '产品状态', name : 'productionStatus', align : 'left', width : "5%", render : function(rowdata, rowindex, value, column) {
+				var data={1:'生产',2:'停产'}; 
+				return data[value];
+			} },
+			{display : '创建时间', name : 'createTime', align : 'left', width : "10%", render : function(rowdata, rowindex, value, column) {
+				var str = dateTimeFormatter(value, "yyyy-MM-dd hh:mm:ss");
+				return str;
+			}},
+			{display : '操作', name : '', align : 'left', width : "9%", render : function(rowdata, rowindex, value, column) {
+				var view='';
+// 				view = view+'<span class="img_list hand" title="查看" onclick="toDetalis(\''+ rowdata.id + '\');"></span>';
+				view=view+'<span class="img_pencil hand" title="修改" onclick="toModById(\''+ rowdata.id + '\');"></span>';
+				view=view+'<span class="img_remove hand" title="删除" onclick="deleteById(\''+ rowdata.id + '\');"></span>';
+				return '<div class="padding_top4 padding_left5">' +view + '</div>';
+			}}
+			
+		],
+		data:data,
+		width : '100%',
+		height : '90%',
+		selectRowButtonOnly : false,
+		onCheckRow : function(checked, rowdata, rowindex, rowDomElement) {
+		},
+		checkbox : false,
+		rownumbers : true,
+		usePager : false,
+		percentWidthMode : true,
+		toolbar : {
+			items : [ {
+				text : '新增',
+				click : toAddPoll,
+				iconClass : 'icon_add'
+			}]
+		}
+	});
+}
+
+function loadData() {
+	loadPagationData({
+		url : BasePath + "poll/pollmgt/poll/page",
+		data : getParams(),
+		grid : grid,
+		pageContent : "pageContent"
+	});
+}
+
+function getParams() {
+	return {
+		orgCode:$("#orgCode").val()
+	}
+}
+var dialog = null;
+function toAddPoll() {
+	dialog = new Dialog();
+	dialog.Title = "新增污染源"; 
+	dialog.URL = "addPoll.html";
+	dialog.Width = 850;
+	dialog.ShowButtonRow = true;
+	dialog.OKEvent = function(){
+		dialog.innerFrame.contentWindow.addPoll(dialog, searchHandler);
+	};
+	dialog.show();
+}
+function toModById(id){ 
+	pollId = id;
+	dialog = new Dialog();
+	dialog.Title = "编辑污染源"; 
+	dialog.URL = "modPoll.html";
+	dialog.Width = 850;
+	dialog.ShowButtonRow = true;
+
+	dialog.OKEvent = function(){
+		dialog.innerFrame.contentWindow.modPoll(dialog, searchHandler);
+	};
+	dialog.show();
+}
+var pollId = "";
+function toDetalis(id) {
+	pollId = id;
+	dialog = new Dialog();
+	dialog.Title = "详情";
+	dialog.URL = "pollDetail.html";
+	dialog.Width = 850;
+	dialog.ShowButtonRow = true;
+	dialog.ShowOkButton = false;
+	dialog.show();
+}
+
+function searchHandler() {
+	grid.setOptions({
+		params : getParams()
+	});
+	//页号重置为1
+	grid.setNewPage(1);
+	loadData();
+}
+
+function resetSearch() {
+	$("#orgCode").val("");
+	searchHandler();
+}
+
+function deleteById(id){
+	Dialog.confirm("确认删除吗", function(){ 
+		$.ajax({
+			url : BasePath + "poll/pollmgt/poll/del",
+			dataType : "json",
+			contentType : "application/json; charset=utf-8",
+			type : "post",
+			data : JSON.stringify({id : id}),
+			cache : false,
+			success : function(data) {
+				Dialog.alert(data.msg, function(){
+					if (data.status == "1") {
+						searchHandler();
+					}
+				});
+			}
+		});
+		
+	});
+	
+}
+</script>
+</head>
+<body>
+	<div class="box2" panelTitle="查询">
+		<div class="search-top-div">
+				<table class="tableStyle">
+					<tr>
+						<th class="table_title">组织代码</th>
+						<td class="table_content"><input type="text" value="" id="orgCode" name="orgCode" class="input" /></td>
+						<td>
+							<button class="button" type="button" onclick="searchHandler()">
+								<span class="icon_find">查询</span>
+							</button>
+							<button class="button" type="button" onclick="resetSearch()">
+								<span class="icon_reload">重置</span>
+							</button>
+						</td>
+					</tr>
+				</table>
+		</div>
+	</div>
+	<div class="padding_right5">
+		<div id="maingrid"></div>
+	</div>
+	<div id="pageContent" style="height:35px;"></div>   
+</body>
+</html>

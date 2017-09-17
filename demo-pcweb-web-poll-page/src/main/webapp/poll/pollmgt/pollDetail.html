@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+
+<link href="../../common/libs/qui/3.3/css/import_basic.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" id="skin" prePath="../../" splitMode="true" href="../../common/libs/qui/3.3/skins/blue/style.css"/>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/jquery.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/language/cn.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/main.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/framework.js"></script>
+<style type="text/css">
+.hide{display: none;}
+</style>
+<title>任务详情</title>
+<script type="text/javascript">
+var pollId = parent.pollId;
+var BasePath="../../../cgi/"; 
+$(function(){
+	loadPollDetails();
+});
+
+function loadPollDetails() {
+	$.ajax({
+		url : BasePath + "poll/pollmgt/poll/get",
+		dataType : "json",
+		contentType : "application/json; charset=utf-8",
+		type : "post",
+		data : JSON.stringify({id : pollId}),
+		cache : false,
+		success : function(data) {
+			parent.Dialog.alert(data.msg, function(){
+				if (data.status == "1") {
+					if (data.data) {
+						$("#taskDetails").removeClass("hide");
+					}
+				}
+			});
+		}
+	});
+}
+
+
+</script>
+</head>
+<body>
+	<div id="taskDetails" class="box2 hide" statusText="">
+		<table class="">
+			<tr>
+				<th>id：</th>
+				<td id="task_num"></td>
+				<th>任务类型：</th>
+				<td></td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

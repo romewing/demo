@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<link href="../../common/libs/qui/3.3/css/import_basic.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" id="skin" prePath="../../" splitMode="true" href="../../common/libs/qui/3.3/skins/blue/style.css"/>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/jquery.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/language/cn.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/main.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/framework.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/form/datePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/form/upload/fileUpload.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/form/upload/handlers.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/table/quiGrid.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/popup/drag.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/popup/dialog.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/form/datePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/form/form.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/form/validationRule.js"></script>
+<script type="text/javascript" src="../../common/libs/qui/3.3/js/form/validation.js"></script>
+
+<title>新增污染源</title>
+<script type="text/javascript">
+var BasePath="../../../cgi/"; 
+var pollId = parent.pollId;
+function modPoll(dialog,callback) {
+	
+	var valid = $('#MyForm').validationEngine({
+		returnIsValid : true
+	});
+	if (valid) { 
+		var params = {
+				id:pollId,
+				name : $("#name").val(),
+				enterpriseIntroduction:$("#enterpriseIntroduction").val(),
+				addrDetail:$("#addrDetail").val(),
+				webSite:$("#webSite").val(),
+				email:$("#eMail").val(),
+				orgCode:$("#orgCode").val(),
+				zipCode:$("#zipCode").val(),
+				productionStatus:$("#productionStatus").val()
+			
+		};
+		$.ajax({
+			url : BasePath + "poll/pollmgt/poll/mod",
+			dataType : "json",
+			contentType : "application/json; charset=utf-8",
+			type : "post",
+			data : JSON.stringify(params),
+			cache : false,
+			success : function(data) {
+				parent.Dialog.alert(data.msg, function(){
+					if (data.status == "1") {
+						callback();
+						dialog.close();
+					}
+				});
+			}
+		});
+	}
+}
+
+$(function(){
+	loadDataById();
+});
+
+function loadDataById(){
+	var params = {
+			id : pollId
+		};
+	$.ajax({
+		url : BasePath + "poll/pollmgt/poll/get",
+		dataType : "json",
+		contentType : "application/json; charset=utf-8",
+		type : "post",
+		data : JSON.stringify(params),
+		cache : false,
+		success : function(data) {
+			if (data.status == "1") {
+				$("#name").val(data.data.name); 
+				$("#webSite").val(data.data.webSite);
+				$("#eMail").val(data.data.email);
+				$("#addrDetail").val(data.data.addrDetail);
+				$("#productionStatus").setValue(data.data.productionStatus);
+				$("#productionStatus").attr("relValue", "1");
+				$("#productionStatus").render();
+				//$("#productionStatus").attr("selectedValue",data.data.productionStatus);
+				
+				$("#orgCode").val(data.data.orgCode);
+				$("#zipCode").val(data.data.zipCode);
+				$("#enterpriseIntroduction").val(data.data.enterpriseIntroduction);
+			}
+			
+		}
+	});
+}
+
+
+</script>
+</head>
+<body>
+	<div class="box2" statusText="">
+		<form action="" id="MyForm">
+			<table class="one-tab two-tab">
+				<tr>
+					<th><span class="star">*</span>污染源名称：</th>
+					<td><input type="text" id="name" name="name" value="" class="validate[required,length[0,50]]" /></td>
+					<th><span class="star">*</span>官网：</th>
+					<td><input type="text" id="webSite" name="webSite" value="" class="validate[required,length[0,50]]" /></td>
+				</tr>
+				<tr>
+					<th><span class="star">*</span>eMail：</th>
+					
+					<td><input type="text" id="eMail" name="eMail" value="" class="validate[required,length[0,50],custom[email]]" /></td>
+					<th><span class="star">*</span>详细地址：</th>
+					<td><input type="text" id="addrDetail" name="addrDetail" value="" class="validate[required,length[0,100]]" /></td>
+				</tr>
+
+				<tr>
+					<th><span class="star">*</span>生产状态：</th>
+					<td>
+					<select data='{"list":[{"id":"1","name":"生产"},{"id":"2","name":"停产"}]}' prompt="请选择" id="productionStatus" name="productionStatus" selectedValue="" labelField="name" valueField="id" class="validate[required]" style="width: 150px;"></select>
+					</td>
+					<th><span class="star">*</span>行政编码：</th>
+					<td><input type="text" id="orgCode" name="orgCode" value="" class="validate[required,length[0,50],custom[noSpecialCaracters]]" /></td>
+					
+				</tr>
+				<tr>
+					<th>邮编：</th>
+					<td><input type="text" id="zipCode" name="zipCode" value="" class="validate[required,custom[zipcode]]" /></td>
+					<th>企业介绍：</th>
+					<td><textarea colspan='3' class="validate[length[0,1330]]" id="enterpriseIntroduction" name="enterpriseIntroduction" value=""></textarea></td>
+				</tr>
+			</table>
+		</form>
+	</div>
+</body>
+</html>
